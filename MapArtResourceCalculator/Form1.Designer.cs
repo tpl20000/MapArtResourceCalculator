@@ -34,6 +34,12 @@
             this.serverLogBox = new System.Windows.Forms.RichTextBox();
             this.startServerButton = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.itemsTotalLabel = new System.Windows.Forms.Label();
+            this.itemsMissingLabel = new System.Windows.Forms.Label();
+            this.itemsAvailableLabel = new System.Windows.Forms.Label();
+            this.itemsPicker = new System.Windows.Forms.ComboBox();
+            this.addItemsButton = new System.Windows.Forms.Button();
+            this.adderTextBox = new System.Windows.Forms.TextBox();
             this.clientConnectButton = new System.Windows.Forms.Button();
             this.clientAddressLabel = new System.Windows.Forms.Label();
             this.clientAddressTextBox = new System.Windows.Forms.TextBox();
@@ -83,7 +89,7 @@
             // startServerButton
             // 
             this.startServerButton.BackColor = System.Drawing.Color.Green;
-            this.startServerButton.Font = new System.Drawing.Font("Anonymous Pro", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.startServerButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.startServerButton.ForeColor = System.Drawing.Color.White;
             this.startServerButton.Location = new System.Drawing.Point(7, 20);
             this.startServerButton.Name = "startServerButton";
@@ -95,6 +101,12 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.itemsTotalLabel);
+            this.groupBox2.Controls.Add(this.itemsMissingLabel);
+            this.groupBox2.Controls.Add(this.itemsAvailableLabel);
+            this.groupBox2.Controls.Add(this.itemsPicker);
+            this.groupBox2.Controls.Add(this.addItemsButton);
+            this.groupBox2.Controls.Add(this.adderTextBox);
             this.groupBox2.Controls.Add(this.clientConnectButton);
             this.groupBox2.Controls.Add(this.clientAddressLabel);
             this.groupBox2.Controls.Add(this.clientAddressTextBox);
@@ -105,10 +117,64 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Client";
             // 
+            // itemsTotalLabel
+            // 
+            this.itemsTotalLabel.AutoSize = true;
+            this.itemsTotalLabel.Location = new System.Drawing.Point(48, 208);
+            this.itemsTotalLabel.Name = "itemsTotalLabel";
+            this.itemsTotalLabel.Size = new System.Drawing.Size(31, 13);
+            this.itemsTotalLabel.TabIndex = 9;
+            this.itemsTotalLabel.Text = "Total";
+            // 
+            // itemsMissingLabel
+            // 
+            this.itemsMissingLabel.AutoSize = true;
+            this.itemsMissingLabel.Location = new System.Drawing.Point(48, 158);
+            this.itemsMissingLabel.Name = "itemsMissingLabel";
+            this.itemsMissingLabel.Size = new System.Drawing.Size(43, 13);
+            this.itemsMissingLabel.TabIndex = 8;
+            this.itemsMissingLabel.Text = "MIssing";
+            // 
+            // itemsAvailableLabel
+            // 
+            this.itemsAvailableLabel.AutoSize = true;
+            this.itemsAvailableLabel.Location = new System.Drawing.Point(170, 118);
+            this.itemsAvailableLabel.Name = "itemsAvailableLabel";
+            this.itemsAvailableLabel.Size = new System.Drawing.Size(50, 13);
+            this.itemsAvailableLabel.TabIndex = 6;
+            this.itemsAvailableLabel.Text = "Available";
+            // 
+            // itemsPicker
+            // 
+            this.itemsPicker.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.itemsPicker.FormattingEnabled = true;
+            this.itemsPicker.Location = new System.Drawing.Point(6, 115);
+            this.itemsPicker.Name = "itemsPicker";
+            this.itemsPicker.Size = new System.Drawing.Size(121, 21);
+            this.itemsPicker.TabIndex = 5;
+            this.itemsPicker.SelectedIndexChanged += new System.EventHandler(this.itemsPicker_SelectedIndexChanged);
+            // 
+            // addItemsButton
+            // 
+            this.addItemsButton.Location = new System.Drawing.Point(170, 158);
+            this.addItemsButton.Name = "addItemsButton";
+            this.addItemsButton.Size = new System.Drawing.Size(189, 63);
+            this.addItemsButton.TabIndex = 2;
+            this.addItemsButton.Text = "Add";
+            this.addItemsButton.UseVisualStyleBackColor = true;
+            this.addItemsButton.Click += new System.EventHandler(this.addItemsButton_Click);
+            // 
+            // adderTextBox
+            // 
+            this.adderTextBox.Location = new System.Drawing.Point(262, 115);
+            this.adderTextBox.Name = "adderTextBox";
+            this.adderTextBox.Size = new System.Drawing.Size(97, 20);
+            this.adderTextBox.TabIndex = 3;
+            // 
             // clientConnectButton
             // 
             this.clientConnectButton.BackColor = System.Drawing.Color.Green;
-            this.clientConnectButton.Font = new System.Drawing.Font("Anonymous Pro", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.clientConnectButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.clientConnectButton.ForeColor = System.Drawing.Color.White;
             this.clientConnectButton.Location = new System.Drawing.Point(6, 19);
             this.clientConnectButton.Name = "clientConnectButton";
@@ -138,13 +204,14 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(809, 450);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.Text = "Map Art Resource Monitor and Calculator V0.1";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
@@ -164,6 +231,12 @@
         private System.Windows.Forms.Label clientAddressLabel;
         private System.Windows.Forms.TextBox clientAddressTextBox;
         private System.Windows.Forms.Button clientConnectButton;
+        private System.Windows.Forms.Button addItemsButton;
+        private System.Windows.Forms.TextBox adderTextBox;
+        private System.Windows.Forms.ComboBox itemsPicker;
+        private System.Windows.Forms.Label itemsAvailableLabel;
+        private System.Windows.Forms.Label itemsMissingLabel;
+        private System.Windows.Forms.Label itemsTotalLabel;
     }
 }
 
