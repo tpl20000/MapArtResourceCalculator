@@ -12,6 +12,7 @@ using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using Excel = Microsoft.Office.Interop.Excel;
 using Microsoft.Office.Interop.Excel;
+using System.Text.RegularExpressions;
 
 namespace MapArtResourceCalculator
 {
@@ -20,10 +21,12 @@ namespace MapArtResourceCalculator
 
         public bool isServerStarted = false;
         public bool isClientConnected = false;
-        private string fileName = ""; // file path
+        private string fileName = "C:\\Users\\Sentinel\\source\\repos\\MapArtResourceCalculator\\MapArtResourceCalculator\\bin\\Debug\\MapArtItemList.xlsx"; // file path
         public int concurentUserAmount = 100;
         public int serverPort = 8888;
         public int clientPort = 8888;
+
+        private Server srv = new Server();
 
         private Excel.Application xlsxApp;
         private Excel.Workbook xlsxFile;
@@ -46,11 +49,11 @@ namespace MapArtResourceCalculator
             xlsxFile = xlsxApp.Workbooks.Open(fileName);
             xlsxSheet = xlsxFile.Sheets[1];
 
-            itemsPicker.Items.Clear();
+            resourceList.Items.Clear();
 
             int i = 3;
             while (xlsxSheet.Cells[i, 1].Value != null) {
-                itemsPicker.Items.Add(xlsxSheet.Cells[i, 1].Value);
+                resourceList.Items.Add(xlsxSheet.Cells[i, 1].Value);
                 i++;
             }
         }
@@ -68,49 +71,56 @@ namespace MapArtResourceCalculator
             return str;
         }
 
-        private async void serverStartButton_Click(object sender, EventArgs e)
+        private void serverStartButton_Click(object sender, EventArgs e)
         {
             if (!isServerStarted) //if disabled
             {
 
-                ipPoint = new IPEndPoint(IPAddress.Parse(serverAddressTextBox.Text), serverPort);
-                serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                IPAddress tmp;
 
-                serverSocket.Bind(ipPoint);
-                serverSocket.Listen(100);
+                if (!IPAddress.TryParse(serverAddressTextBox.Text, out tmp))
+                {
+                    serverLogBox.AppendText("Server did not start - Bad IP Address!\n");
+                    return;
+                }
 
+                try 
+                {
+                    serverBackgroundWorker.RunWorkerAsync();
+                } 
+                catch (Exception err)
+                {
+                    serverLogBox.AppendText(err.Message);
+                    serverBackgroundWorker.Dispose();
+                }
+                
 
                 isServerStarted = true;
                 startServerButton.BackColor = Color.Red;
-                //startServerButton.Text = "Stop";
                 startServerButton.Text = "Stop";
-                //server start logic
-
                 serverLogBox.AppendText("Server started!\n");
-
-                while (true)
-                {
-
-                    serverLogBox.AppendText("Listening...");
-                    Socket connectedClient = await serverSocket.AcceptAsync();
-                    serverLogBox.AppendText($"Connection established ({connectedClient.RemoteEndPoint})!");
-
-                }
 
             }
             else
             {
 
-                serverSocket.Close();
+                srv.StopServer();
 
                 isServerStarted = false;
                 startServerButton.BackColor = Color.Green;
                 startServerButton.Text = "Start";
-                //server shutdown logic
 
                 serverLogBox.AppendText("Server stopped!\n");
 
             }
+
+        }
+
+        private void ServerBackgroundWorkerStart(object sender, DoWorkEventArgs e)
+        {
+
+            BackgroundWorker worker = sender as BackgroundWorker;
+            srv.StartServer(IPAddress.Parse(serverAddressTextBox.Text), serverPort);
 
         }
 
@@ -147,13 +157,14 @@ namespace MapArtResourceCalculator
             int addedVal = 0;
             int.TryParse(adderTextBox.Text, out addedVal);
 
-            xlsxSheet.Cells[itemsPicker.SelectedIndex + 3, 4] = xlsxSheet.Cells[itemsPicker.SelectedIndex + 3, 4].Value + addedVal;
-            xlsxSheet.Cells[itemsPicker.SelectedIndex + 3, 3] = xlsxSheet.Cells[itemsPicker.SelectedIndex + 3, 2].Value - xlsxSheet.Cells[itemsPicker.SelectedIndex + 3, 4].Value;
-            itemsAvailableLabel.Text = xlsxSheet.Cells[itemsPicker.SelectedIndex + 3, 4].Value.ToString() + " + ";
-            itemsMissingLabel.Text = xlsxSheet.Cells[itemsPicker.SelectedIndex + 3, 3].Value.ToString();
-            if (xlsxSheet.Cells[itemsPicker.SelectedIndex + 3, 2].Value >= 64 * 27) itemsTotalLabel.Text = convertToSB(xlsxSheet.Cells[itemsPicker.SelectedIndex + 3, 2].Value.ToString());
-            else if (xlsxSheet.Cells[itemsPicker.SelectedIndex + 3, 2].Value <= 64) itemsTotalLabel.Text = xlsxSheet.Cells[itemsPicker.SelectedIndex + 3, 2].Value.ToString();
-            else itemsTotalLabel.Text = convertToStack(xlsxSheet.Cells[itemsPicker.SelectedIndex + 3, 2].Value.ToString());
+            xlsxSheet.Cells[resourceList.SelectedIndex + 3, 4] = xlsxSheet.Cells[resourceList.SelectedIndex + 3, 4].Value + addedVal;
+            xlsxSheet.Cells[resourceList.SelectedIndex + 3, 3] = xlsxSheet.Cells[resourceList.SelectedIndex + 3, 2].Value - xlsxSheet.Cells[resourceList.SelectedIndex + 3, 4].Value;
+            itemsAvailableLabel.Text = xlsxSheet.Cells[resourceList.SelectedIndex + 3, 4].Value.ToString() + " + ";
+            itemsMissingLabel.Text = xlsxSheet.Cells[resourceList.SelectedIndex + 3, 3].Value.ToString();
+            if (xlsxSheet.Cells[resourceList.SelectedIndex + 3, 2].Value >= 64 * 27) itemsTotalLabel.Text = convertToSB(xlsxSheet.Cells[resourceList.SelectedIndex + 3, 2].Value.ToString());
+            else if (xlsxSheet.Cells[resourceList.SelectedIndex + 3, 2].Value <= 64) itemsTotalLabel.Text = xlsxSheet.Cells[resourceList.SelectedIndex + 3, 2].Value.ToString();
+            else itemsTotalLabel.Text = convertToStack(xlsxSheet.Cells[resourceList.SelectedIndex + 3, 2].Value.ToString());
+
             xlsxApp.Visible = false;
             xlsxApp.UserControl = false;
             xlsxFile.Save();
@@ -162,17 +173,23 @@ namespace MapArtResourceCalculator
 
         private void itemsPicker_SelectedIndexChanged(object sender, EventArgs e)
         {
-            itemsAvailableLabel.Text = xlsxSheet.Cells[itemsPicker.SelectedIndex + 3, 4].Value.ToString() + " + ";
-            itemsMissingLabel.Text = xlsxSheet.Cells[itemsPicker.SelectedIndex + 3, 3].Value.ToString();
-            if (xlsxSheet.Cells[itemsPicker.SelectedIndex + 3, 2].Value >= 64 * 27) itemsTotalLabel.Text = convertToSB(xlsxSheet.Cells[itemsPicker.SelectedIndex + 3, 2].Value.ToString());
-            else if (xlsxSheet.Cells[itemsPicker.SelectedIndex + 3, 2].Value <= 64) itemsTotalLabel.Text = xlsxSheet.Cells[itemsPicker.SelectedIndex + 3, 2].Value.ToString();
-            else itemsTotalLabel.Text = convertToStack(xlsxSheet.Cells[itemsPicker.SelectedIndex + 3, 2].Value.ToString());
+
+            itemsAvailableLabel.Text = xlsxSheet.Cells[resourceList.SelectedIndex + 3, 4].Value.ToString() + " + ";
+            itemsMissingLabel.Text = xlsxSheet.Cells[resourceList.SelectedIndex + 3, 3].Value.ToString();
+            if (xlsxSheet.Cells[resourceList.SelectedIndex + 3, 2].Value >= 64 * 27) itemsTotalLabel.Text = convertToSB(xlsxSheet.Cells[resourceList.SelectedIndex + 3, 2].Value.ToString());
+            else if (xlsxSheet.Cells[resourceList.SelectedIndex + 3, 2].Value <= 64) itemsTotalLabel.Text = xlsxSheet.Cells[resourceList.SelectedIndex + 3, 2].Value.ToString();
+            else itemsTotalLabel.Text = convertToStack(xlsxSheet.Cells[resourceList.SelectedIndex + 3, 2].Value.ToString());
         }
         
+        
+
         // tmp cleaning and closing file function
         // MOVE TO SERVER SHUTDOWN FUNCTION
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
+
+            srv.StopServer();
+
             GC.Collect();
             GC.WaitForPendingFinalizers();
 
