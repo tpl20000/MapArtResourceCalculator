@@ -34,15 +34,17 @@
             this.serverLogBox = new System.Windows.Forms.RichTextBox();
             this.startServerButton = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.resourceList = new System.Windows.Forms.ListBox();
             this.itemsTotalLabel = new System.Windows.Forms.Label();
             this.itemsMissingLabel = new System.Windows.Forms.Label();
             this.itemsAvailableLabel = new System.Windows.Forms.Label();
-            this.itemsPicker = new System.Windows.Forms.ComboBox();
             this.addItemsButton = new System.Windows.Forms.Button();
             this.adderTextBox = new System.Windows.Forms.TextBox();
             this.clientConnectButton = new System.Windows.Forms.Button();
             this.clientAddressLabel = new System.Windows.Forms.Label();
             this.clientAddressTextBox = new System.Windows.Forms.TextBox();
+            this.serverBackgroundWorker = new System.ComponentModel.BackgroundWorker();
+            this.clientBackgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -101,10 +103,10 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.resourceList);
             this.groupBox2.Controls.Add(this.itemsTotalLabel);
             this.groupBox2.Controls.Add(this.itemsMissingLabel);
             this.groupBox2.Controls.Add(this.itemsAvailableLabel);
-            this.groupBox2.Controls.Add(this.itemsPicker);
             this.groupBox2.Controls.Add(this.addItemsButton);
             this.groupBox2.Controls.Add(this.adderTextBox);
             this.groupBox2.Controls.Add(this.clientConnectButton);
@@ -117,10 +119,19 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Client";
             // 
+            // resourceList
+            // 
+            this.resourceList.FormattingEnabled = true;
+            this.resourceList.Location = new System.Drawing.Point(7, 59);
+            this.resourceList.Name = "resourceList";
+            this.resourceList.Size = new System.Drawing.Size(147, 355);
+            this.resourceList.TabIndex = 10;
+            this.resourceList.SelectedIndexChanged += new System.EventHandler(this.itemsPicker_SelectedIndexChanged);
+            // 
             // itemsTotalLabel
             // 
             this.itemsTotalLabel.AutoSize = true;
-            this.itemsTotalLabel.Location = new System.Drawing.Point(48, 208);
+            this.itemsTotalLabel.Location = new System.Drawing.Point(170, 92);
             this.itemsTotalLabel.Name = "itemsTotalLabel";
             this.itemsTotalLabel.Size = new System.Drawing.Size(31, 13);
             this.itemsTotalLabel.TabIndex = 9;
@@ -129,11 +140,11 @@
             // itemsMissingLabel
             // 
             this.itemsMissingLabel.AutoSize = true;
-            this.itemsMissingLabel.Location = new System.Drawing.Point(48, 158);
+            this.itemsMissingLabel.Location = new System.Drawing.Point(170, 62);
             this.itemsMissingLabel.Name = "itemsMissingLabel";
-            this.itemsMissingLabel.Size = new System.Drawing.Size(43, 13);
+            this.itemsMissingLabel.Size = new System.Drawing.Size(42, 13);
             this.itemsMissingLabel.TabIndex = 8;
-            this.itemsMissingLabel.Text = "MIssing";
+            this.itemsMissingLabel.Text = "Missing";
             // 
             // itemsAvailableLabel
             // 
@@ -144,21 +155,11 @@
             this.itemsAvailableLabel.TabIndex = 6;
             this.itemsAvailableLabel.Text = "Available";
             // 
-            // itemsPicker
-            // 
-            this.itemsPicker.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.itemsPicker.FormattingEnabled = true;
-            this.itemsPicker.Location = new System.Drawing.Point(6, 115);
-            this.itemsPicker.Name = "itemsPicker";
-            this.itemsPicker.Size = new System.Drawing.Size(121, 21);
-            this.itemsPicker.TabIndex = 5;
-            this.itemsPicker.SelectedIndexChanged += new System.EventHandler(this.itemsPicker_SelectedIndexChanged);
-            // 
             // addItemsButton
             // 
-            this.addItemsButton.Location = new System.Drawing.Point(170, 158);
+            this.addItemsButton.Location = new System.Drawing.Point(160, 357);
             this.addItemsButton.Name = "addItemsButton";
-            this.addItemsButton.Size = new System.Drawing.Size(189, 63);
+            this.addItemsButton.Size = new System.Drawing.Size(236, 57);
             this.addItemsButton.TabIndex = 2;
             this.addItemsButton.Text = "Add";
             this.addItemsButton.UseVisualStyleBackColor = true;
@@ -200,6 +201,10 @@
             this.clientAddressTextBox.Size = new System.Drawing.Size(100, 20);
             this.clientAddressTextBox.TabIndex = 2;
             // 
+            // serverBackgroundWorker
+            // 
+            this.serverBackgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.ServerBackgroundWorkerStart);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -233,10 +238,12 @@
         private System.Windows.Forms.Button clientConnectButton;
         private System.Windows.Forms.Button addItemsButton;
         private System.Windows.Forms.TextBox adderTextBox;
-        private System.Windows.Forms.ComboBox itemsPicker;
         private System.Windows.Forms.Label itemsAvailableLabel;
         private System.Windows.Forms.Label itemsMissingLabel;
         private System.Windows.Forms.Label itemsTotalLabel;
+        private System.Windows.Forms.ListBox resourceList;
+        private System.ComponentModel.BackgroundWorker serverBackgroundWorker;
+        private System.ComponentModel.BackgroundWorker clientBackgroundWorker;
     }
 }
 
