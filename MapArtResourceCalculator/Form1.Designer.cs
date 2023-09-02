@@ -45,13 +45,19 @@
             this.clientAddressTextBox = new System.Windows.Forms.TextBox();
             this.serverBackgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.clientBackgroundWorker = new System.ComponentModel.BackgroundWorker();
+            this.serverPortTextBox = new System.Windows.Forms.TextBox();
+            this.serverPortLabel = new System.Windows.Forms.Label();
+            this.clientPortTextBox = new System.Windows.Forms.TextBox();
+            this.clientPortLabel = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.serverPortLabel);
             this.groupBox1.Controls.Add(this.serverAddressLabel);
+            this.groupBox1.Controls.Add(this.serverPortTextBox);
             this.groupBox1.Controls.Add(this.serverAddressTextBox);
             this.groupBox1.Controls.Add(this.serverLogBox);
             this.groupBox1.Controls.Add(this.startServerButton);
@@ -65,7 +71,7 @@
             // serverAddressLabel
             // 
             this.serverAddressLabel.AutoSize = true;
-            this.serverAddressLabel.Location = new System.Drawing.Point(165, 30);
+            this.serverAddressLabel.Location = new System.Drawing.Point(167, 19);
             this.serverAddressLabel.Name = "serverAddressLabel";
             this.serverAddressLabel.Size = new System.Drawing.Size(45, 13);
             this.serverAddressLabel.TabIndex = 3;
@@ -73,10 +79,11 @@
             // 
             // serverAddressTextBox
             // 
-            this.serverAddressTextBox.Location = new System.Drawing.Point(216, 27);
+            this.serverAddressTextBox.Location = new System.Drawing.Point(218, 16);
             this.serverAddressTextBox.Name = "serverAddressTextBox";
             this.serverAddressTextBox.Size = new System.Drawing.Size(100, 20);
             this.serverAddressTextBox.TabIndex = 2;
+            this.serverAddressTextBox.Text = "0.0.0.0";
             // 
             // serverLogBox
             // 
@@ -103,8 +110,10 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.clientPortLabel);
             this.groupBox2.Controls.Add(this.resourceList);
             this.groupBox2.Controls.Add(this.itemsTotalLabel);
+            this.groupBox2.Controls.Add(this.clientPortTextBox);
             this.groupBox2.Controls.Add(this.itemsMissingLabel);
             this.groupBox2.Controls.Add(this.itemsAvailableLabel);
             this.groupBox2.Controls.Add(this.addItemsButton);
@@ -188,7 +197,7 @@
             // clientAddressLabel
             // 
             this.clientAddressLabel.AutoSize = true;
-            this.clientAddressLabel.Location = new System.Drawing.Point(160, 30);
+            this.clientAddressLabel.Location = new System.Drawing.Point(160, 19);
             this.clientAddressLabel.Name = "clientAddressLabel";
             this.clientAddressLabel.Size = new System.Drawing.Size(45, 13);
             this.clientAddressLabel.TabIndex = 3;
@@ -196,7 +205,7 @@
             // 
             // clientAddressTextBox
             // 
-            this.clientAddressTextBox.Location = new System.Drawing.Point(211, 27);
+            this.clientAddressTextBox.Location = new System.Drawing.Point(211, 16);
             this.clientAddressTextBox.Name = "clientAddressTextBox";
             this.clientAddressTextBox.Size = new System.Drawing.Size(100, 20);
             this.clientAddressTextBox.TabIndex = 2;
@@ -204,6 +213,40 @@
             // serverBackgroundWorker
             // 
             this.serverBackgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.ServerBackgroundWorkerStart);
+            // 
+            // serverPortTextBox
+            // 
+            this.serverPortTextBox.Location = new System.Drawing.Point(218, 36);
+            this.serverPortTextBox.Name = "serverPortTextBox";
+            this.serverPortTextBox.Size = new System.Drawing.Size(100, 20);
+            this.serverPortTextBox.TabIndex = 2;
+            this.serverPortTextBox.Text = "8888";
+            // 
+            // serverPortLabel
+            // 
+            this.serverPortLabel.AutoSize = true;
+            this.serverPortLabel.Location = new System.Drawing.Point(167, 39);
+            this.serverPortLabel.Name = "serverPortLabel";
+            this.serverPortLabel.Size = new System.Drawing.Size(26, 13);
+            this.serverPortLabel.TabIndex = 3;
+            this.serverPortLabel.Text = "Port";
+            // 
+            // clientPortTextBox
+            // 
+            this.clientPortTextBox.Location = new System.Drawing.Point(211, 36);
+            this.clientPortTextBox.Name = "clientPortTextBox";
+            this.clientPortTextBox.Size = new System.Drawing.Size(100, 20);
+            this.clientPortTextBox.TabIndex = 2;
+            this.clientPortTextBox.Text = "8888";
+            // 
+            // clientPortLabel
+            // 
+            this.clientPortLabel.AutoSize = true;
+            this.clientPortLabel.Location = new System.Drawing.Point(160, 39);
+            this.clientPortLabel.Name = "clientPortLabel";
+            this.clientPortLabel.Size = new System.Drawing.Size(26, 13);
+            this.clientPortLabel.TabIndex = 3;
+            this.clientPortLabel.Text = "Port";
             // 
             // Form1
             // 
@@ -244,6 +287,10 @@
         private System.Windows.Forms.ListBox resourceList;
         private System.ComponentModel.BackgroundWorker serverBackgroundWorker;
         private System.ComponentModel.BackgroundWorker clientBackgroundWorker;
+        private System.Windows.Forms.Label serverPortLabel;
+        private System.Windows.Forms.TextBox serverPortTextBox;
+        private System.Windows.Forms.Label clientPortLabel;
+        private System.Windows.Forms.TextBox clientPortTextBox;
     }
 }
 

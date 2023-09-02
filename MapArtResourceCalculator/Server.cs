@@ -58,9 +58,13 @@ namespace MapArtResourceCalculator
         {
 
             tkSource.Cancel();
-            serverSocket.Close();
+            if (serverSocket != null)
+            {
+                serverSocket.Close();
+                serverSocket = null;
+            }
             ipPoint = null;
-            serverSocket = null;
+            
 
         }
 

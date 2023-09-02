@@ -21,17 +21,20 @@ namespace MapArtResourceCalculator
 
         public bool isServerStarted = false;
         public bool isClientConnected = false;
-        private string fileName = "C:\\Users\\Sentinel\\source\\repos\\MapArtResourceCalculator\\MapArtResourceCalculator\\bin\\Debug\\MapArtItemList.xlsx"; // file path
+        private string fileName = "C:\\Users\\Sentinel\\source\\repos\\MapArtResourceCalculator\\MapArtResourceCalculator\\bin\\Debug\\MapArtItemList.xlsx";
         public int concurentUserAmount = 100;
-        public int serverPort = 8888;
-        public int clientPort = 8888;
+
+        private IPAddress parsedAddress;
+        private int parsedPort;
 
         private Server srv = new Server();
 
+        //remove once moved to server
         private Excel.Application xlsxApp;
         private Excel.Workbook xlsxFile;
         private Excel.Worksheet xlsxSheet;
 
+        //remove once moved to server/client
         private IPEndPoint ipPoint;
         private Socket serverSocket;
         private Socket clientSocket;
@@ -44,7 +47,8 @@ namespace MapArtResourceCalculator
             loadItemList();
         }
 
-        private void loadItemList() {
+        private void loadItemList()
+        {
             xlsxApp = new Excel.Application();
             xlsxFile = xlsxApp.Workbooks.Open(fileName);
             xlsxSheet = xlsxFile.Sheets[1];
@@ -52,7 +56,8 @@ namespace MapArtResourceCalculator
             resourceList.Items.Clear();
 
             int i = 3;
-            while (xlsxSheet.Cells[i, 1].Value != null) {
+            while (xlsxSheet.Cells[i, 1].Value != null)
+            {
                 resourceList.Items.Add(xlsxSheet.Cells[i, 1].Value);
                 i++;
             }
@@ -60,40 +65,51 @@ namespace MapArtResourceCalculator
 
         // utility functions for better resource representation
         // MOVE TO THE CLIENT SIDE
-        private string convertToSB(string s) {
+        private string convertToSB(string s)
+        {
             int num = int.Parse(s);
-            string str = (Math.Round((num / (64.0 * 27.0)), 2)).ToString() + " SB";
+            string str = $"{Math.Round(num / (64.0 * 27.0), 2)} SB";
             return str;
         }
-        private string convertToStack(string s) {
+
+        private string convertToStack(string s)
+        {
             int num = int.Parse(s);
-            string str = (num / 64).ToString() + " * 64 + " + (num % 64).ToString();
+            string str = $"{num / 64} * 64 + {num % 64}";
             return str;
         }
 
         private void serverStartButton_Click(object sender, EventArgs e)
         {
-            if (!isServerStarted) //if disabled
+            if (!isServerStarted) //start server if disabled
             {
 
-                IPAddress tmp;
-
-                if (!IPAddress.TryParse(serverAddressTextBox.Text, out tmp))
+                //check if text in server address box is a valid ip address
+                if (!IPAddress.TryParse(serverAddressTextBox.Text, out parsedAddress))
                 {
-                    serverLogBox.AppendText("Server did not start - Bad IP Address!\n");
+                    serverLogBox.AppendText($"Server did not start - Bad IP Address! ({serverAddressTextBox.Text})\n");
                     return;
                 }
 
-                try 
+                //check if text in server port box is a valid port
+                if (!serverPortTextBox.Text.All(char.IsDigit) || (int.Parse(serverPortTextBox.Text) > 65536))
+                {
+                    serverLogBox.AppendText($"Server did not start - Bad Port! ({serverPortTextBox.Text})\n");
+                    return;
+                }
+                parsedPort = int.Parse(serverPortTextBox.Text);
+
+                //run server in a separate thread
+                try
                 {
                     serverBackgroundWorker.RunWorkerAsync();
-                } 
+                }
                 catch (Exception err)
                 {
                     serverLogBox.AppendText(err.Message);
                     serverBackgroundWorker.Dispose();
                 }
-                
+
 
                 isServerStarted = true;
                 startServerButton.BackColor = Color.Red;
@@ -101,7 +117,7 @@ namespace MapArtResourceCalculator
                 serverLogBox.AppendText("Server started!\n");
 
             }
-            else
+            else //stop server if running
             {
 
                 srv.StopServer();
@@ -120,18 +136,18 @@ namespace MapArtResourceCalculator
         {
 
             BackgroundWorker worker = sender as BackgroundWorker;
-            srv.StartServer(IPAddress.Parse(serverAddressTextBox.Text), serverPort);
+            srv.StartServer(parsedAddress, parsedPort);
 
         }
 
         private async void clientConnectButton_Click(object sender, EventArgs e)
         {
 
-            if (!isClientConnected) 
+            if (!isClientConnected)
             {
 
                 clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                clientSocket.ConnectAsync(IPAddress.Parse(clientAddressTextBox.Text), clientPort);
+                clientSocket.ConnectAsync(IPAddress.Parse(clientAddressTextBox.Text), int.Parse(clientPortTextBox.Text));
 
                 isClientConnected = true;
                 clientConnectButton.Text = "Disconnect";
@@ -153,8 +169,8 @@ namespace MapArtResourceCalculator
 
         private void addItemsButton_Click(object sender, EventArgs e)
         {
-            
-            int addedVal = 0;
+
+            int addedVal;
             int.TryParse(adderTextBox.Text, out addedVal);
 
             xlsxSheet.Cells[resourceList.SelectedIndex + 3, 4] = xlsxSheet.Cells[resourceList.SelectedIndex + 3, 4].Value + addedVal;
@@ -180,16 +196,17 @@ namespace MapArtResourceCalculator
             else if (xlsxSheet.Cells[resourceList.SelectedIndex + 3, 2].Value <= 64) itemsTotalLabel.Text = xlsxSheet.Cells[resourceList.SelectedIndex + 3, 2].Value.ToString();
             else itemsTotalLabel.Text = convertToStack(xlsxSheet.Cells[resourceList.SelectedIndex + 3, 2].Value.ToString());
         }
-        
-        
 
-        // tmp cleaning and closing file function
-        // MOVE TO SERVER SHUTDOWN FUNCTION
+
+
+        
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
 
-            srv.StopServer();
+            if (isServerStarted) srv.StopServer();
 
+            // tmp cleaning and closing file function
+            // MOVE TO SERVER SHUTDOWN FUNCTION
             GC.Collect();
             GC.WaitForPendingFinalizers();
 
